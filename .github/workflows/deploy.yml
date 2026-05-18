@@ -15,4 +15,5 @@ jobs:
       - name: Push to HF
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://dede1975:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/dede1975/RupiahForecast-UTS main
+          HF_REPO: huggingface.co/spaces/dede1975/RupiahForecast-UTS
+        run: git push --force https://dede1975:$HF_TOKEN@$HF_REPO main

@@ -36,7 +36,7 @@ Pustaka utama yang digunakan:
 - `numpy` & `pandas` (Pemrosesan data)
 
 ## Cara Menjalankan Aplikasi
-Note: pastikan anda menyesiaukan bagian "NOTEBOOKS" dan "OUT_IDR" yang ada di file extract_charts.py sesuai dengan folder anda
+`Note: pastikan anda menyesiaukan bagian "NOTEBOOKS" dan "OUT_IDR" yang ada di file extract_charts.py sesuai dengan folder anda`
 
 1. **Aktifkan Virtual Environment** (Jika ada):
    - Windows: `venv\Scripts\activate`
@@ -52,21 +52,5 @@ Note: pastikan anda menyesiaukan bagian "NOTEBOOKS" dan "OUT_IDR" yang ada di fi
    Buka peramban (browser) web Anda dan akses:
    👉 `http://127.0.0.1:5000`
 
-## Struktur Direktori
 
-```text
-/
-├── app/
-│   ├── static/          # CSS, JavaScript, dan Gambar Grafik (dari notebook)
-│   ├── templates/       # File HTML (layout.html, index.html, compare.html)
-│   └── app.py           # Backend Flask & API
-├── data/                # Dataset CSV awal (saat proses pelatihan)
-├── model/               # Model Machine Learning & Scaler (.h5, .pkl, .joblib) tersimpan
-├── notebook/            # Source code riset eksperimen (Jupyter Notebook)
-├── extract_charts.py    # Script otomatis mengambil grafik hasil eksperimen dari .ipynb
-├── requirements.txt     # Daftar dependencies / pustaka Python
-└── README.md            # Dokumentasi ini
-```
-
----
 *Dikembangkan untuk eksperimen AI dan Prediksi Deret Waktu Finansial.*

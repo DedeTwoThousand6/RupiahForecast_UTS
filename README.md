@@ -1,3 +1,10 @@
+**UJIAN TENGAH SEMESTER**
+**Nama: Dede Jamaludin**
+**Nim: 301240007**
+**Prodi: Teknik Informatika**
+**Fakultas Teknologi Informasi**
+**Universitas Bale Bandung**
+
 # RupiahForecast - Enterprise AI Dashboard
 
 RupiahForecast adalah dasbor intelijen finansial berbasis Machine Learning untuk melakukan prediksi dan segmentasi nilai tukar (kurs) USD ke IDR. Platform ini mengimplementasikan pemrosesan paralel (Multithreading) untuk menjalankan inferensi pada 5 model Machine Learning secara serempak.

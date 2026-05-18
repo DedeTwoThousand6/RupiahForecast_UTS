@@ -1,7 +1,7 @@
 name: Sync to Hugging Face Spaces
 on:
   push:
-    branches: [main] # Ganti 'master' jika nama branch utama Anda masih master
+    branches: [main]
 
 jobs:
   deploy:
@@ -15,4 +15,5 @@ jobs:
       - name: Push to HF
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://RupiahForecast_UTS:$HF_TOKEN@huggingface.co/spaces/USERNAME_HF_ANDA/NAMA_SPACE_ANDA main
+        run: |
+          git push --force https://DedeTwoThousand6:$HF_TOKEN@huggingface.co/spaces/DedeTwoThousand6/RupiahForecast_UTS main

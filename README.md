@@ -50,9 +50,12 @@ Pustaka utama yang digunakan:
 ## Cara Menjalankan Aplikasi
 `Note: pastikan anda menyesiaukan bagian "NOTEBOOKS" dan "OUT_IDR" yang ada di file extract_charts.py sesuai dengan folder anda`
 
-1. **Aktifkan Virtual Environment** (Jika ada):
-   - Windows: `venv\Scripts\activate`
-   - Linux/Mac: `source venv/bin/activate`
+1. **Buat Virtual Environment dan Install Requirments**:
+   - `python -m venv venv`
+   - `venv\Scripts\activate`
+   - `pip install -r requirements.txt`
+
+   
 
 2. **Jalankan Aplikasi Flask**:
    Dari direktori proyek utama (folder yang berisi `app/` dan file ini), jalankan:

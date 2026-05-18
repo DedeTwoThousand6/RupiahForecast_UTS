@@ -36,6 +36,7 @@ Pustaka utama yang digunakan:
 - `numpy` & `pandas` (Pemrosesan data)
 
 ## Cara Menjalankan Aplikasi
+Note: pastikan anda menyesiaukan bagian "NOTEBOOKS" dan "OUT_IDR" yang ada di file extract_charts.py sesuai dengan folder anda
 
 1. **Aktifkan Virtual Environment** (Jika ada):
    - Windows: `venv\Scripts\activate`

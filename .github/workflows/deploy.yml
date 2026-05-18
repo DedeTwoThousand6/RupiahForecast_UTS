@@ -1,19 +1,26 @@
 name: Sync to Hugging Face Spaces
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           lfs: true
-          
-      - name: Push to HF
+
+      - name: Push to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_REPO: huggingface.co/spaces/dede1975/RupiahForecast-UTS
-        run: git push --force https://dede1975:$HF_TOKEN@$HF_REPO main
+
+        run: |
+          git remote add hf https://dede1975:$HF_TOKEN@$HF_REPO
+          git push --force hf main

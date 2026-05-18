@@ -188,14 +188,47 @@ def compare():
 @app.route('/api/predict', methods=['POST'])
 def api_predict():
     try:
-        ticker = yf.Ticker("IDR=X")
-        hist   = ticker.history(period="60d")
-        prices = hist['Close'].dropna().tolist()
+        prices = []
+        
+        # 1. Coba ambil data langsung dari Yahoo Finance API (bypass library yfinance jika error)
+        try:
+            import urllib.request
+            import json
+            url = "https://query1.finance.yahoo.com/v8/finance/chart/IDR=X?range=6mo&interval=1d"
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+            with urllib.request.urlopen(req, timeout=5) as response:
+                data = json.loads(response.read().decode())
+                quotes = data['chart']['result'][0]['indicators']['quote'][0]['close']
+                prices = [p for p in quotes if p is not None]
+        except Exception as e:
+            print(f"[Warning] Direct API fetch failed: {e}")
+        
+        # 2. Jika cara 1 gagal, gunakan library yfinance
+        if len(prices) == 0:
+            try:
+                ticker = yf.Ticker("IDR=X")
+                hist   = ticker.history(period="6mo")
+                prices = hist['Close'].dropna().tolist()
+            except Exception as e:
+                print(f"[Warning] yfinance fetch failed: {e}")
+        
+        # 3. Jika gagal semua, gunakan CSV lokal sebagai Fallback
+        if len(prices) == 0:
+            csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'USD-IDR.csv')
+            if os.path.exists(csv_path):
+                import pandas as pd
+                df = pd.read_csv(csv_path, sep=';')
+                prices = df['Kurs'].dropna().head(30).tolist()[::-1]
+            else:
+                return jsonify({"error": "Gagal mendapatkan data harga dari Yahoo Finance. Coba lagi nanti."}), 500
+            
+        # Pad dengan nilai tertua jika masih kurang dari 30
         if len(prices) < 30:
-            return jsonify({"error": "Data historis tidak cukup (< 30 hari)."}), 500
+            prices = [prices[0]] * (30 - len(prices)) + prices
+            
         inputs = prices[-30:]
     except Exception as e:
-        return jsonify({"error": f"Gagal ambil data Yahoo Finance: {str(e)}"}), 500
+        return jsonify({"error": f"Terjadi kesalahan sistem: {str(e)}"}), 500
 
     results = run_parallel_prediction(inputs)
     return jsonify({

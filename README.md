@@ -1,8 +1,13 @@
 **UJIAN TENGAH SEMESTER**
+
 **Nama: Dede Jamaludin**
+
 **Nim: 301240007**
+
 **Prodi: Teknik Informatika**
+
 **Fakultas Teknologi Informasi**
+
 **Universitas Bale Bandung**
 
 # RupiahForecast - Enterprise AI Dashboard

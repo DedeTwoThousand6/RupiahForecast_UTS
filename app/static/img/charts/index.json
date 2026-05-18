@@ -1,0 +1,18 @@
+{
+  "ann": [
+    "ann_0.png"
+  ],
+  "backpropagation": [
+    "backpropagation_0.png"
+  ],
+  "kmeans": [
+    "kmeans_0.png",
+    "kmeans_1.png"
+  ],
+  "regresi_linear": [
+    "regresi_linear_0.png"
+  ],
+  "rnn": [
+    "rnn_0.png"
+  ]
+}

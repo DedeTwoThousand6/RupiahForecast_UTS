@@ -1,0 +1,298 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<!-- HERO BANNER -->
+<div class="hero-banner">
+    <div>
+        <div class="hero-badge">
+            <i class="fas fa-bolt"></i> Parallel Inference Engine Active
+        </div>
+        <h2 class="hero-title">
+            Predictive Analytics <span>USD to IDR</span>
+        </h2>
+        <p class="hero-desc">
+            Dasbor intelijen finansial berbasis AI. Pilih mode <strong>Otomatis</strong> untuk tarik data pasar 30 hari real-time, atau mode <strong>Manual</strong> untuk memasukkan data kurs sendiri.
+        </p>
+    </div>
+    <div style="flex-shrink:0;pointer-events:none;opacity:0.9;">
+        <dotlottie-wc src="https://lottie.host/649de397-ae9f-4847-9258-8b7c575b3098/B4bbuTbDnw.lottie" style="width:220px;height:220px;" autoplay loop></dotlottie-wc>
+    </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="dashboard-grid">
+
+    <!-- LEFT: ENGINE PANEL -->
+    <div class="card engine-panel">
+
+        <!-- MODE TABS -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" id="tabAuto" onclick="switchMode('auto')">
+                <i class="fas fa-robot"></i> Otomatis
+            </button>
+            <button class="mode-tab" id="tabManual" onclick="switchMode('manual')">
+                <i class="fas fa-keyboard"></i> Input Manual
+            </button>
+        </div>
+
+        <!-- AUTO MODE -->
+        <div id="modeAuto">
+            <div class="panel-title"><i class="fas fa-robot"></i> Automated Engine</div>
+            <p class="panel-desc">
+                Sistem terhubung ke Yahoo Finance dan menarik data penutupan kurs IDR/USD 30 hari terakhir secara otomatis.
+            </p>
+            <div class="config-box">
+                <div class="config-row">
+                    <span class="config-label">Target Ticker</span>
+                    <span class="config-value green">IDR=X (Yahoo Finance)</span>
+                </div>
+                <div class="config-row">
+                    <span class="config-label">Window Size</span>
+                    <span class="config-value gold">30 Trading Days</span>
+                </div>
+                <div class="config-row">
+                    <span class="config-label">Inference Mode</span>
+                    <span class="config-value purple">Async Threads (5 Model)</span>
+                </div>
+            </div>
+            <form id="predictFormAuto">
+                <button type="submit" class="btn-premium" id="submitBtnAuto">
+                    <i class="fas fa-sync-alt" id="btnIconAuto"></i>
+                    <span id="btnTextAuto">Ambil Data &amp; Eksekusi Model</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- MANUAL MODE -->
+        <div id="modeManual" class="hidden">
+            <div class="panel-title"><i class="fas fa-keyboard"></i> Input Data Manual</div>
+            <p class="panel-desc">
+                Masukkan nilai kurs USD/IDR historis (minimal 5, ideal 30 hari). Pisahkan dengan koma atau baris baru.
+            </p>
+            <form id="predictFormManual">
+                <div class="input-group">
+                    <label class="input-label">
+                        <i class="fas fa-list-ol"></i> Data Kurs Historis (Rp)
+                    </label>
+                    <textarea
+                        id="manualInput"
+                        class="input-textarea"
+                        rows="8"
+                        placeholder="Contoh:&#10;16250&#10;16300&#10;16280&#10;16350&#10;16400&#10;(minimal 5 nilai, satu per baris atau pisahkan koma)"
+                    ></textarea>
+                    <div class="input-hint">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="inputCount">0 nilai dimasukkan</span>
+                    </div>
+                </div>
+                <div class="quick-fill-label">Contoh Preset Data:</div>
+                <div class="quick-fill-grid">
+                    <button type="button" class="quick-fill-btn" onclick="fillPreset('normal')">
+                        Normal (16.100–16.400)
+                    </button>
+                    <button type="button" class="quick-fill-btn" onclick="fillPreset('weak')">
+                        Rupiah Lemah (16.500+)
+                    </button>
+                    <button type="button" class="quick-fill-btn" onclick="fillPreset('strong')">
+                        Rupiah Kuat (&lt;15.800)
+                    </button>
+                </div>
+                <button type="submit" class="btn-premium" id="submitBtnManual" style="margin-top:16px;">
+                    <i class="fas fa-brain" id="btnIconManual"></i>
+                    <span id="btnTextManual">Jalankan Prediksi Manual</span>
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- RIGHT: RESULT AREA -->
+    <div>
+        <!-- EMPTY STATE -->
+        <div id="emptyState" class="card state-box">
+            <div class="state-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="state-title">Menunggu Data Input</div>
+            <p class="state-desc">Pilih mode di panel kiri, lalu klik tombol eksekusi untuk memulai prediksi AI.</p>
+        </div>
+
+        <!-- LOADING STATE -->
+        <div id="loadingState" class="card state-box hidden">
+            <div class="loader" style="width:52px;height:52px;margin-bottom:20px;"></div>
+            <div class="state-title" style="color:#947429;">ThreadPoolExecutor Berjalan...</div>
+            <p class="state-desc">Memproses 5 model ML secara paralel...</p>
+        </div>
+
+        <!-- RESULT STATE -->
+        <div id="resultState" class="hidden animate-fadeIn">
+
+            <!-- MODE BADGE + KURS STATS -->
+            <div class="stat-grid">
+                <div class="card stat-card">
+                    <div class="stat-icon green"><i class="fas fa-money-bill-wave"></i></div>
+                    <div>
+                        <span class="stat-label">Kurs Referensi</span>
+                        <div class="stat-value" id="txtLatestKurs">Rp 0</div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-database"></i></div>
+                    <div>
+                        <span class="stat-label">Mode &amp; Status</span>
+                        <div class="stat-status">
+                            <span style="width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
+                            <span id="txtMode">Terhubung</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHART PREDIKSI -->
+            <div class="card chart-panel" style="margin-bottom:24px;">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Komparasi Estimasi Kurs (IDR)
+                    </div>
+                    <span class="chart-badge">Satuan Rupiah</span>
+                </div>
+                <div id="predictionChart" style="min-height:280px;"></div>
+            </div>
+
+            <!-- INPUT HISTORY CHART -->
+            <div class="card chart-panel" style="margin-bottom:24px;">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-history"></i>
+                        Data Input Historis (7 Hari Terakhir)
+                    </div>
+                    <span class="chart-badge">Time-Series</span>
+                </div>
+                <div id="historyChart" style="min-height:220px;"></div>
+            </div>
+
+            <!-- RANKING -->
+            <div class="ranking-section">
+                <div class="ranking-label">
+                    <i class="fas fa-list-ol"></i> Peringkat &amp; Output Semua Model AI
+                </div>
+                <div id="rankingContainer" class="ranking-grid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+/* ── Mode Switch ─────────────────────────────────────────────── */
+let activeMode = 'auto';
+function switchMode(mode) {
+    activeMode = mode;
+    document.getElementById('modeAuto').classList.toggle('hidden', mode !== 'auto');
+    document.getElementById('modeManual').classList.toggle('hidden', mode !== 'manual');
+    document.getElementById('tabAuto').classList.toggle('active', mode === 'auto');
+    document.getElementById('tabManual').classList.toggle('active', mode === 'manual');
+}
+
+/* ── Manual Input Counter ────────────────────────────────────── */
+document.getElementById('manualInput').addEventListener('input', function() {
+    const vals = this.value.trim().split(/[\s,\n]+/).filter(v => v && !isNaN(parseFloat(v)));
+    const el   = document.getElementById('inputCount');
+    el.textContent = vals.length + ' nilai dimasukkan';
+    el.style.color = vals.length >= 5 ? '#16a34a' : '#dc2626';
+});
+
+/* ── Quick Fill Presets ──────────────────────────────────────── */
+function fillPreset(type) {
+    const presets = {
+        normal: [16100,16150,16200,16180,16220,16250,16230,16270,16300,16280,
+                 16310,16290,16320,16350,16330,16360,16340,16380,16400,16370,
+                 16390,16410,16400,16420,16380,16400,16350,16370,16390,16410],
+        weak:   [16500,16520,16550,16530,16580,16600,16570,16620,16650,16630,
+                 16660,16640,16680,16700,16680,16720,16700,16740,16760,16750,
+                 16780,16800,16770,16820,16800,16830,16810,16850,16870,16860],
+        strong: [15900,15880,15860,15850,15830,15820,15800,15810,15790,15780,
+                 15800,15780,15760,15750,15740,15730,15750,15720,15710,15700,
+                 15720,15700,15680,15670,15690,15680,15660,15650,15670,15660]
+    };
+    document.getElementById('manualInput').value = (presets[type] || []).join('\n');
+    document.getElementById('manualInput').dispatchEvent(new Event('input'));
+}
+
+/* ── Submit Handlers ─────────────────────────────────────────── */
+function setLoadingState(loading) {
+    const empty   = document.getElementById('emptyState');
+    const loading_ = document.getElementById('loadingState');
+    const result  = document.getElementById('resultState');
+    if (loading) {
+        empty.classList.add('hidden');
+        loading_.classList.remove('hidden');
+        result.classList.add('hidden');
+    } else {
+        loading_.classList.add('hidden');
+    }
+}
+
+function setButtonLoading(btnId, iconId, textId, loading, defaultText) {
+    const btn  = document.getElementById(btnId);
+    const icon = document.getElementById(iconId);
+    const txt  = document.getElementById(textId);
+    btn.disabled = loading;
+    icon.style.animation = loading ? 'spin 0.8s linear infinite' : '';
+    txt.textContent = loading ? 'Memproses...' : defaultText;
+}
+
+async function handlePredictResponse(response) {
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Server error');
+
+    document.getElementById('txtLatestKurs').textContent = 'Rp ' + data.latest_kurs.toLocaleString('id-ID');
+    document.getElementById('txtMode').textContent =
+        data.mode === 'auto' ? 'Auto — Yahoo Finance (30 Hari)' : 'Manual — Data Pengguna';
+
+    if (typeof renderDashboardResult === 'function') renderDashboardResult(data);
+
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('resultState').classList.remove('hidden');
+}
+
+// Auto form
+document.getElementById('predictFormAuto').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    setLoadingState(true);
+    setButtonLoading('submitBtnAuto', 'btnIconAuto', 'btnTextAuto', true, 'Ambil Data & Eksekusi Model');
+    try {
+        const res = await fetch('/api/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        await handlePredictResponse(res);
+    } catch(err) {
+        alert('Error: ' + err.message);
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('emptyState').classList.remove('hidden');
+    } finally {
+        setButtonLoading('submitBtnAuto', 'btnIconAuto', 'btnTextAuto', false, 'Ambil Data & Eksekusi Model');
+    }
+});
+
+// Manual form
+document.getElementById('predictFormManual').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const raw = document.getElementById('manualInput').value.trim();
+    if (!raw) { alert('Masukkan data kurs terlebih dahulu!'); return; }
+    setLoadingState(true);
+    setButtonLoading('submitBtnManual', 'btnIconManual', 'btnTextManual', true, 'Jalankan Prediksi Manual');
+    try {
+        const res = await fetch('/api/predict-manual', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ values: raw })
+        });
+        await handlePredictResponse(res);
+    } catch(err) {
+        alert('Error: ' + err.message);
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('emptyState').classList.remove('hidden');
+    } finally {
+        setButtonLoading('submitBtnManual', 'btnIconManual', 'btnTextManual', false, 'Jalankan Prediksi Manual');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,275 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-balance-scale" style="color:#947429;font-size:28px;vertical-align:middle;margin-right:10px;"></i><span>Perbandingan</span> Performa Model</h2>
+    <p>Evaluasi metrik performa semua model machine learning saat pelatihan, beserta visualisasi grafik dari setiap notebook.</p>
+</div>
+
+<!-- ── METRICS SUMMARY CARDS ─────────────────────────────────── -->
+<div class="metrics-summary-grid">
+    <div class="metric-highlight-card green">
+        <div class="mhc-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="mhc-body">
+            <div class="mhc-label">Best R² Score</div>
+            <div class="mhc-value">98.64%</div>
+            <div class="mhc-sub">Linear Regression</div>
+        </div>
+    </div>
+    <div class="metric-highlight-card gold">
+        <div class="mhc-icon"><i class="fas fa-crosshairs"></i></div>
+        <div class="mhc-body">
+            <div class="mhc-label">Best MAPE</div>
+            <div class="mhc-value">0.36%</div>
+            <div class="mhc-sub">LSTM (RNN)</div>
+        </div>
+    </div>
+    <div class="metric-highlight-card purple">
+        <div class="mhc-icon"><i class="fas fa-project-diagram"></i></div>
+        <div class="mhc-body">
+            <div class="mhc-label">Silhouette Score</div>
+            <div class="mhc-value">0.3857</div>
+            <div class="mhc-sub">K-Means (K=3)</div>
+        </div>
+    </div>
+    <div class="metric-highlight-card blue">
+        <div class="mhc-icon"><i class="fas fa-layer-group"></i></div>
+        <div class="mhc-body">
+            <div class="mhc-label">Total Model</div>
+            <div class="mhc-value">5</div>
+            <div class="mhc-sub">Aktif &amp; Terlatih</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── PERFORMANCE COMPARISON CHART ──────────────────────────── -->
+<div class="card chart-panel" style="margin-bottom:28px;">
+    <div class="chart-header">
+        <div class="chart-title"><i class="fas fa-chart-bar"></i> Radar Perbandingan Performa (Normalisasi)</div>
+        <span class="chart-badge">R² · RMSE · MAPE · Speed</span>
+    </div>
+    <div id="radarChart" style="min-height:320px;"></div>
+</div>
+
+<div class="compare-chart-row">
+    <!-- RMSE Comparison Bar -->
+    <div class="card chart-panel" style="flex:1;">
+        <div class="chart-header">
+            <div class="chart-title"><i class="fas fa-ruler"></i> RMSE Comparison</div>
+        </div>
+        <div id="rmseChart" style="min-height:250px;"></div>
+    </div>
+    <!-- R² Comparison -->
+    <div class="card chart-panel" style="flex:1;">
+        <div class="chart-header">
+            <div class="chart-title"><i class="fas fa-percentage"></i> R² Score</div>
+        </div>
+        <div id="r2Chart" style="min-height:250px;"></div>
+    </div>
+</div>
+
+<!-- ── REGRESSION TABLE ────────────────────────────────────────── -->
+<div class="table-wrapper" style="margin-top:28px;">
+    <div class="table-header" style="color:#947429;">
+        <i class="fas fa-chart-line" style="margin-right:8px;"></i> Model Prediksi Regresi &amp; Time-Series
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Algoritma</th>
+                <th>Tipe</th>
+                <th>R-Squared (R²)</th>
+                <th>RMSE (Rp)</th>
+                <th>MAE (Rp)</th>
+                <th>MAPE / Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="medal">🥇</span> Linear Regression</td>
+                <td><span class="type-badge green">Regresi</span></td>
+                <td><span class="metric-good">98.64%</span></td>
+                <td>60.80</td>
+                <td>45.95</td>
+                <td class="muted">—</td>
+            </tr>
+            <tr>
+                <td><span class="medal">🥈</span> Custom Backpropagation</td>
+                <td><span class="type-badge gold">Neural Net</span></td>
+                <td><span class="metric-good">98.51%</span></td>
+                <td class="muted">N/A</td>
+                <td class="muted">N/A</td>
+                <td class="muted">Val Loss: 0.0044</td>
+            </tr>
+            <tr>
+                <td><span class="medal">🥉</span> LSTM (RNN)</td>
+                <td><span class="type-badge purple">Recurrent NN</span></td>
+                <td class="muted">N/A</td>
+                <td>74.77</td>
+                <td>57.06</td>
+                <td><span class="metric-good">MAPE: 0.36%</span></td>
+            </tr>
+            <tr>
+                <td>ANN (Dense)</td>
+                <td><span class="type-badge gold">Neural Net</span></td>
+                <td class="muted">N/A</td>
+                <td>77.05</td>
+                <td>62.35</td>
+                <td class="muted">—</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ── CLUSTERING TABLE ───────────────────────────────────────── -->
+<div class="table-wrapper" style="margin-top:20px;margin-bottom:40px;">
+    <div class="table-header" style="color:#7c3aed;">
+        <i class="fas fa-project-diagram" style="margin-right:8px;"></i> Model Segmentasi (Unsupervised)
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Algoritma</th>
+                <th>Tipe</th>
+                <th>Best K</th>
+                <th>Inertia</th>
+                <th>Silhouette Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>K-Means Clustering</td>
+                <td><span class="type-badge blue">Clustering</span></td>
+                <td><strong>3</strong></td>
+                <td>2,409.09</td>
+                <td><span class="metric-ok">0.3857</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ── NOTEBOOK CHART GALLERY ─────────────────────────────────── -->
+<div class="section-title">
+    <i class="fas fa-images"></i> Visualisasi Grafik Notebook
+    <span class="section-title-sub">Output visual langsung dari setiap file .ipynb</span>
+</div>
+
+{% set notebooks = [
+    ('regresi_linear', 'Linear Regression', 'fas fa-chart-line', '#16a34a', 'Scatter plot aktual vs prediksi dan residual analysis dari model regresi linear.'),
+    ('ann',            'ANN (Dense)',        'fas fa-brain',      '#d4af37', 'Loss curve dan evaluasi performa Artificial Neural Network selama pelatihan.'),
+    ('backpropagation','Backpropagation',    'fas fa-network-wired','#947429','Training loss history dari implementasi custom backpropagation neural network.'),
+    ('rnn',            'LSTM (RNN)',         'fas fa-wave-square', '#7c3aed', 'Prediksi vs aktual kurs USD/IDR dari model Long Short-Term Memory.'),
+    ('kmeans',         'K-Means Clustering', 'fas fa-project-diagram','#0ea5e9','Visualisasi cluster pasar kurs dan Elbow Method untuk menentukan K optimal.'),
+] %}
+
+{% for key, title, icon, color, desc in notebooks %}
+{% set charts = chart_index.get(key, []) %}
+<div class="notebook-section">
+    <div class="notebook-header" style="border-left-color: {{ color }};">
+        <div class="notebook-title">
+            <span class="notebook-icon" style="background: {{ color }}20; color: {{ color }};">
+                <i class="{{ icon }}"></i>
+            </span>
+            <div>
+                <div class="notebook-name">{{ title }}</div>
+                <div class="notebook-desc">{{ desc }}</div>
+            </div>
+        </div>
+        <span class="notebook-badge">{{ charts|length }} grafik</span>
+    </div>
+
+    {% if charts %}
+    <div class="chart-gallery">
+        {% for img in charts %}
+        <div class="gallery-item" onclick="openLightbox('{{ url_for('static', filename='img/charts/' + img) }}', '{{ title }} — Chart {{ loop.index }}')">
+            <img src="{{ url_for('static', filename='img/charts/' + img) }}"
+                 alt="{{ title }} chart {{ loop.index }}"
+                 loading="lazy">
+            <div class="gallery-overlay">
+                <i class="fas fa-expand"></i>
+                <span>Lihat Penuh</span>
+            </div>
+            <div class="gallery-label">{{ title }} — Grafik {{ loop.index }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-charts">
+        <i class="fas fa-image-slash"></i>
+        <span>Belum ada grafik tersimpan dari notebook ini.</span>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+<!-- ── LIGHTBOX ────────────────────────────────────────────────── -->
+<div id="lightbox" class="lightbox-overlay hidden" onclick="closeLightbox()">
+    <div class="lightbox-inner" onclick="event.stopPropagation()">
+        <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+        <img id="lightboxImg" src="" alt="Chart">
+    </div>
+</div>
+
+<script>
+/* ── Lightbox ──────────────────────────────────────────────────── */
+function openLightbox(src, caption) {
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxCaption').textContent = caption;
+    document.getElementById('lightbox').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('lightbox').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+/* ── Radar Chart ───────────────────────────────────────────────── */
+const radarOpts = {
+    series: [
+        { name: 'Linear Regression', data: [98, 85, 80, 90] },
+        { name: 'Backpropagation',   data: [97, 70, 70, 75] },
+        { name: 'LSTM',              data: [70, 80, 95, 65] },
+        { name: 'ANN',               data: [65, 75, 70, 70] },
+        { name: 'K-Means',           data: [0,  0,  0,  85] },
+    ],
+    chart: { type: 'radar', height: 320, toolbar: { show: false }, background: 'transparent' },
+    xaxis: { categories: ['R² Score', 'Akurasi RMSE', 'Akurasi MAPE', 'Kecepatan'] },
+    fill:  { opacity: 0.15 },
+    stroke:{ width: 2 },
+    markers:{ size: 4 },
+    colors: ['#16a34a','#947429','#7c3aed','#d4af37','#0ea5e9'],
+    legend: { position: 'bottom', fontSize: '12px' },
+    plotOptions: { radar: { polygons: { strokeColor: 'rgba(212,175,55,0.2)', fill: { colors: ['transparent'] } } } }
+};
+new ApexCharts(document.querySelector('#radarChart'), radarOpts).render();
+
+/* ── RMSE Chart ────────────────────────────────────────────────── */
+const rmseOpts = {
+    series: [{ name: 'RMSE (Rp)', data: [60.80, null, 74.77, 77.05, null] }],
+    chart: { type: 'bar', height: 250, toolbar: { show: false }, background: 'transparent' },
+    plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } },
+    dataLabels: { enabled: true, formatter: v => v ? 'Rp ' + v : 'N/A' },
+    xaxis: { categories: ['Lin. Reg.', 'Backprop', 'LSTM', 'ANN', 'K-Means'] },
+    yaxis: { labels: { formatter: v => v ? v.toFixed(0) : '' } },
+    colors: ['#d4af37'],
+    fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical', gradientToColors: ['#947429'], opacityFrom: 1, opacityTo: 0.8 } },
+    grid: { borderColor: 'rgba(212,175,55,0.15)', strokeDashArray: 4 },
+    tooltip: { y: { formatter: v => v ? 'Rp ' + v : 'N/A' } }
+};
+new ApexCharts(document.querySelector('#rmseChart'), rmseOpts).render();
+
+/* ── R² Chart ──────────────────────────────────────────────────── */
+const r2Opts = {
+    series: [98.64, 98.51, 0, 0, 0],
+    chart: { type: 'donut', height: 250, toolbar: { show: false }, background: 'transparent' },
+    labels: ['Linear Reg.', 'Backprop', 'LSTM (N/A)', 'ANN (N/A)', 'K-Means (N/A)'],
+    colors: ['#16a34a','#947429','#e5e7eb','#d1d5db','#9ca3af'],
+    dataLabels: { formatter: (v, opts) => opts.w.globals.labels[opts.seriesIndex] + '\n' + (v > 0 ? v.toFixed(1)+'%' : 'N/A') },
+    legend: { position: 'bottom', fontSize: '11px' },
+    plotOptions: { pie: { donut: { size: '60%', labels: { show: true, total: { show: true, label: 'Best R²', formatter: () => '98.64%' } } } } }
+};
+new ApexCharts(document.querySelector('#r2Chart'), r2Opts).render();
+</script>
+{% endblock %}

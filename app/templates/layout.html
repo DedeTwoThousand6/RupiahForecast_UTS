@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RupiahForecast - Platform prediksi kurs USD/IDR berbasis AI dengan 5 model Machine Learning paralel.">
+    <title>RupiahForecast | Enterprise AI Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js" type="module"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div id="initial-blank-loader">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+            <div class="loader"></div>
+            <p style="font-size:11px;font-weight:700;color:#9a8c6e;letter-spacing:0.12em;text-transform:uppercase;">Initializing AI Dashboard...</p>
+        </div>
+    </div>
+
+    <aside>
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <div class="sidebar-brand">
+                <h1>Rupiah<span>Forecast</span></h1>
+                <small>Enterprise AI v1.0</small>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav-section-label">Core Platform</div>
+            <a href="{{ url_for('index') }}" class="nav-link {{ 'active' if request.path == '/' else '' }}">
+                <i class="fas fa-th-large"></i> Dashboard Utama
+            </a>
+            <a href="{{ url_for('compare') }}" class="nav-link {{ 'active' if request.path == '/compare' else '' }}">
+                <i class="fas fa-chart-bar"></i> Perbandingan Model
+            </a>
+
+            <div class="nav-section-label">Data Actions</div>
+            <button onclick="exportCSV()" class="nav-link">
+                <i class="fas fa-file-csv" style="color:#16a34a;"></i> Export Analisis (.CSV)
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="dot"></div>
+            <span>5 ML Engines Connected</span>
+        </div>
+    </aside>
+
+    <main>
+        <div id="toast-container"></div>
+        <div class="page-content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('initial-blank-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 500);
+            }
+        });
+    </script>
+</body>
+</html>
